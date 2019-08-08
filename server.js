@@ -41,7 +41,6 @@ function defineRoutes(){
     expressApp.use((request, response, next)=>{
         /**essentially express will use these functions to resolve the request and if that function cannot fully resolve the request then it's handed down to the next function [top down order]*/
         
-        console.log("testing-results: ",/^\/(?:[\w\d]+)(?:[\/?#].*$)?$/.test(request.url));
         if(/^\/(?:index\/?)?(?:[?#].*$)?$/.test(request.url)){
             request.url = '/index.html';
         }
@@ -51,7 +50,6 @@ function defineRoutes(){
         }
         else if(/^\/(?:[\w\d]+)(?:[\/?#].*$)?$/.test(request.url)){
             let [,basename] = request.url.match(/^\/([\w\d]+)(?:[\/?#].*$)?$/);
-            console.log("getting basename: ",basename);
             request.url = `${basename}.html`;
         }
         
