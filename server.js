@@ -4,59 +4,43 @@
 
 const path = require("path");
 const http = require("http");
-const express = require("express")
+const express = require("express");
+const expressApp = express();
+const fetch = require("node-fetch");
+const {Observable} = require("rxjs/Observable");
+
+const httpServer = http.createServer(expressApp);
+const socketIo = require("socket.io")(httpServer);
 
 const WEB_PATH = path.join(__dirname, "web");
 const HTTP_PORT = 8039;
+const endpoint = "https://api.iextrading.com/1.0";
 
-const expressApp = express();
-const httpServer = http.createServer(expressApp);
 
-const socketIo = require("socket.io")(httpServer);
-
-var WebSocket = require('ws');
-var ws = new WebSocket('wss://api.tiingo.com/iex');
-
-var subscribe = {
-    'eventName':'subscribe',
-    'authorization':'fe78323407f6d763d3251dd034deec181009ab70',
-    'eventData': {
-        'thresholdLevel': 5
+var observable = Observable.create(observer => {
+    try {
+      setInterval(() => {
+        fetch(`${endpoint}/tops?symbols=fb`)
+          .then(response => response.json())
+          .then(response => {
+            observer.next(response);
+          });
+      }, 5000);
+    } catch (err) {
+      observer.error(err);
     }
-}
-ws.on('open', function open() {
-    ws.send(JSON.stringify(subscribe));
-});
-
-socketIo.on("connection", socket => {
-    const {id} = socket;
-    console.log(`sending data to client ${id}......`);
-    socket.join(`room for${id}`);
+  });
+  
+  
+  socketIo.on("connection", socket => {
+      const {id} = socket;
+      console.log(`sending data to client ${id}......`);
+      socket.join(`room for${id}`);
+      
+      observable.subscribe(iexData => {
+          socketIo.to(`room for${id}`).emit("get-data", iexData);
+      }, error => console.log("ERROR!!!",error));
     
-    ws.on('message', function(stockData) {
-        const {data} = JSON.parse(stockData);
-        const iexData = {};
-
-        if(data) {
-            iexData['date']  = data[1];
-            iexData['nanoseconds'] = data[2];
-            iexData['ticker'] = data[3];
-            iexData['bidsize'] = data[4];
-            iexData['bidprice'] = data[5];
-            iexData['midprice'] = data[6];
-            iexData['askprice'] = data[7];
-            iexData['asksize'] = data[8];
-            iexData['lastprice'] = data[9];
-            iexData['lastsize'] = data[10];
-            iexData['halted'] = data[11];
-            iexData['afterhours'] = data[12];
-            iexData['ISO'] = data[13];
-            iexData['oddlot'] = data[14];
-            iexData['nmsRule'] = data[15];
-        } 
-
-        socketIo.to(`room for${id}`).emit("get-data", iexData);
-    });
     socket.on("disconnect", ()=>{
         socket.leave(`room for${id}`);
     });
