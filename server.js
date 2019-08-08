@@ -16,16 +16,16 @@ const WEB_PATH = path.join(__dirname, "web");
 const HTTP_PORT = 8039;
 const endpoint = "https://api.iextrading.com/1.0";
 
-
-var observable = Observable.create(observer => {
+var symbol = "fb";
+const observable = Observable.create(observer => {
     try {
       setInterval(() => {
-        fetch(`${endpoint}/tops?symbols=fb`)
+        fetch(`${endpoint}/tops?symbols=${symbol}`)
           .then(response => response.json())
           .then(response => {
             observer.next(response);
           });
-      }, 5000);
+      }, 1000);
     } catch (err) {
       observer.error(err);
     }
@@ -38,10 +38,14 @@ var observable = Observable.create(observer => {
       socket.join(`room for${id}`);
       
       observable.subscribe(iexData => {
-          socketIo.to(`room for${id}`).emit("get-data", iexData);
+          socketIo.to(`room for${id}`).emit("api-data", iexData);
       }, error => console.log("ERROR!!!",error));
     
-    socket.on("disconnect", ()=>{
+      socket.on('clientRequestStock', (requestedSymbol)=>{
+          symbol = requestedSymbol || symbol;
+      });
+    
+      socket.on("disconnect", ()=>{
         socket.leave(`room for${id}`);
     });
 
