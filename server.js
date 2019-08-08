@@ -58,10 +58,10 @@ function defineRoutes(){
     //used whenever you have an outbound request and need to add custom headers
     const additionalConfigurations = {
         maxAge: 100,
-        setHeaders: (response) => response.setHeader("Server", "Node Workshop: ex6")
+        setHeaders: (response) => response.setHeader("Server", "Sample-express-routes")
     };
 
-    const fileServer = express.static(WEB_PATH, additionalConfigurations)
+    const fileServer = express.static(WEB_PATH, additionalConfigurations);
 
     expressApp.use(fileServer);
 
