@@ -14,38 +14,56 @@ const httpServer = http.createServer(expressApp);
 
 const socketIo = require("socket.io")(httpServer);
 
+var WebSocket = require('ws');
+var ws = new WebSocket('wss://api.tiingo.com/iex');
+
+var subscribe = {
+    'eventName':'subscribe',
+    'authorization':'fe78323407f6d763d3251dd034deec181009ab70',
+    'eventData': {
+        'thresholdLevel': 5
+    }
+}
+ws.on('open', function open() {
+    ws.send(JSON.stringify(subscribe));
+});
+
 socketIo.on("connection", socket => {
     const {id} = socket;
     console.log(`sending data to client ${id}......`);
     socket.join(`room for${id}`);
 
-    let counter = 0;
-    setInterval(()=>{
-            counter = (counter+1)%61;
-            socketIo.to(`room for${id}`).emit("get-data", counter);
-    }, 1000);
+    // let counter = 0;
+    // setInterval(()=>{
+    //         counter = (counter+1)%61;
+    //         socketIo.to(`room for${id}`).emit("get-data", counter);
+    // }, 1000);
+    
+    ws.on('message', function(stockData) {
+        const {data} = JSON.parse(stockData);
+        const iexData = {};
+        
+        if(data) {
+            iexData['date']  = data[1];
+            iexData['nanoseconds'] = data[2];
+            iexData['ticker'] = data[3];
+            iexData['bidsize'] = data[4];
+            iexData['bidprice'] = data[5];
+            iexData['midprice'] = data[6];
+            iexData['askprice'] = data[7];
+            iexData['asksize'] = data[8];
+            iexData['lastprice'] = data[9];
+            iexData['lastsize'] = data[10];
+            iexData['halted'] = data[11];
+            iexData['afterhours'] = data[12];
+            iexData['ISO'] = data[13];
+            iexData['oddlot'] = data[14];
+            iexData['nmsRule'] = data[15];
+        } 
+
+        socketIo.to(`room for${id}`).emit("get-data", iexData);
+    });
 });
-
-
-
-
-// var WebSocket = require('ws');
-// var ws = new WebSocket('wss://api.tiingo.com/iex');
-
-// var subscribe = {
-//     'eventName':'subscribe',
-//     'authorization':'fe78323407f6d763d3251dd034deec181009ab70',
-//     'eventData': {
-//         'thresholdLevel': 5
-//     }
-// }
-// ws.on('open', function open() {
-//     ws.send(JSON.stringify(subscribe));
-// });
-
-// ws.on('message', function(data, flags) {
-//     console.log(data);
-// });
 
 
 
@@ -61,7 +79,6 @@ function main(){
     httpServer.listen(HTTP_PORT);
     console.log(`Listening on http://localhost:${HTTP_PORT}...`);
 }
-
 
 function defineRoutes(){
 
