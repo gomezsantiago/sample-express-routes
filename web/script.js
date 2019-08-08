@@ -1,11 +1,14 @@
 const socket = io("http://localhost:8039");
 
 const results = document.querySelector(".socket-data");
+const btn = document.getElementById("theButton");
+const search = document.getElementById("search");
+var symbol = "";
 
-socket.on("get-data", (response)=>{
+
+socket.on("api-data", (response)=>{
   const data = response[0];
 
-  console.log(data);
   const incomingData = 
     Object.entries(data)
       .map((entry) => `${entry[0]}: ${entry[1]}`);
@@ -13,6 +16,10 @@ socket.on("get-data", (response)=>{
   results.innerHTML = incomingData.join("<br>");
 });
 
+search.addEventListener('change', ({target})=>{
+  symbol = target.value;
+  socket.emit('clientRequestStock',symbol);
+});
 
 // {
 //   symbol: 'FB',
