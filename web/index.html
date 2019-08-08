@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sample Project</title>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/json2html/1.2.0/json2html.min.js"></script>
-    <!-- <script defer src="../ex5-web.js"></script> -->
+    <script defer src="http://localhost:8039/socket.io/socket.io.js"></script>
+    <script defer src="./script.js"></script>
 </head>
 <body>
     <div><h1>Welcome</h1></div>
     <nav>
         <a href="/">Home</a> | <a href="/about">About</a>
     </nav>
+
+    <div>
+        <h2>Socket Response Data:</h2>
+        <p class="socket-data"></p>
+    </div>
 </body>
 </html>
