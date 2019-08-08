@@ -32,17 +32,11 @@ socketIo.on("connection", socket => {
     const {id} = socket;
     console.log(`sending data to client ${id}......`);
     socket.join(`room for${id}`);
-
-    // let counter = 0;
-    // setInterval(()=>{
-    //         counter = (counter+1)%61;
-    //         socketIo.to(`room for${id}`).emit("get-data", counter);
-    // }, 1000);
     
     ws.on('message', function(stockData) {
         const {data} = JSON.parse(stockData);
         const iexData = {};
-        
+
         if(data) {
             iexData['date']  = data[1];
             iexData['nanoseconds'] = data[2];
@@ -63,12 +57,14 @@ socketIo.on("connection", socket => {
 
         socketIo.to(`room for${id}`).emit("get-data", iexData);
     });
+    socket.on("disconnect", ()=>{
+        socket.leave(`room for${id}`);
+    });
+
 });
 
 
-
 main();
-
 
 
 
