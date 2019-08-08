@@ -2,7 +2,6 @@
 
 "use strict";
 
-var util = require("util");
 var path = require("path");
 var http = require("http");
 
@@ -49,7 +48,7 @@ function defineRoutes(){
             return;
         }
         else if(/^\/(?:[\w\d]+)(?:[\/?#].*$)?$/.test(request.url)){
-            let [,basename] = request.url.match(/^\/([\w\d]+)(?:[\/?#].*$)?$/);
+            let [,basename] = request.url.match(/^\/([\w\d]+)(?:[\/?#].*$)?$/);  //ex: if request.url = /about this returns ["/about", "about"]
             request.url = `${basename}.html`;
         }
         
@@ -95,4 +94,14 @@ function defineRoutes(){
     //         serve: "404.html"
     //     }
     // ]
+
+
+
+    /***********
+     * 
+     * Regex rules:
+     * /^A/             starts with A
+     * /(?:x)/          matches x but doesn't remember the match
+     *
+     ************/
 }
