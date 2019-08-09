@@ -12,5 +12,9 @@ The **master** branch contains an example server that utilizes socket.io connect
 ### Running the server
 once node is installed, all that is required to run the server application is to type `./server.js` in the terminal when in the same directory as that file. This should work in a linux based environment, if it doesn't, the first line of code in the server.js file may need to be modified to point to where node is installed in your system.  or simply run `node server.js`
 
+<br>
+
+### Running the client
+the client side of this application is within the **web** folder, this can be hosted on any other local server, using something like vscode built-in live server for example
 
 <hr>
