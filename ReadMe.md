@@ -4,6 +4,7 @@
 The **websockets** branch contains an example of a webpage hosted by a node.js server with express routing and a custom 404 error page.  It also has an example of how to make a websocket connection.
 
 <br>
+
 The **master** branch contains an example server that utilizes socket.io connections to emit stock data obtained from IEX API to it's connected clients
 
 <br>
